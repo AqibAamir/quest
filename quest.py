@@ -224,3 +224,45 @@ class Mage(Character):
         self.max_hp -= 20
         self.attack_power += 10
         self.mana = 100
+
+def cast_spell(self, enemy):
+        if self.mana >= 20:
+            spell_damage = random.randint(15, 30)
+            enemy.hp -= spell_damage
+            self.mana -= 20
+            print(f"{self.name} casts a spell on {enemy.name} for {spell_damage} damage!")
+        else:
+            print(f"{self.name} does not have enough mana to cast a spell!")
+
+class Rogue(Character):
+    def __init__(self, name):
+        super().__init__(name, "Rogue")
+        self.attack_power += 10
+        self.stealth = True
+
+    def sneak_attack(self, enemy):
+        if self.stealth:
+            sneak_damage = random.randint(20, 40)
+            enemy.hp -= sneak_damage
+            print(f"{self.name} performs a sneak attack on {enemy.name} for {sneak_damage} damage!")
+        else:
+            print(f"{self.name} is not in stealth mode!")
+
+# Additional Special Items
+class Armor(SpecialItem):
+    def __init__(self, name, defense_boost):
+        super().__init__(name, None)
+        self.defense_boost = defense_boost
+
+    def use(self, player):
+        if self.name in player.inventory:
+            player.max_hp += self.defense_boost
+            player.hp = min(player.hp + self.defense_boost, player.max_hp)
+            print(f"{player.name} equipped {self.name}, increasing max HP by {self.defense_boost}!")
+            player.inventory.remove(self.name)
+        else:
+            print(f"{player.name} does not have {self.name}!")
+
+# Define some special items
+armor = Armor("Steel Armor", 50)
+magic_staff = SpecialItem("Magic Staff", lambda player: print(f"{player.name} wields a Magic Staff!"))
