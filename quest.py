@@ -309,3 +309,79 @@ def complete_quest(player):
         quest.complete(player)
     else:
         print("You have already completed this quest.")
+
+    # Additional Combat Options
+def enhanced_battle(player, enemy):
+    print(f"A wild {enemy.name} appears!")
+    while player.hp > 0 and enemy.hp > 0:
+        print("\n-- Battle Menu --")
+        print("1. Attack")
+        print("2. Heal")
+        print("3. Use Special Item")
+        print("4. Use Magic (Mage Only)")
+        print("5. Sneak Attack (Rogue Only)")
+        print("6. Run")
+
+        choice = input("Choose an action: ")
+
+        if choice == "1":
+            player.attack(enemy)
+            if enemy.hp > 0:
+                enemy.attack(player)
+        elif choice == "2":
+            player.heal()
+            enemy.attack(player)
+        elif choice == "3":
+            use_item(player)
+            enemy.attack(player)
+        elif choice == "4" and isinstance(player, Mage):
+            player.cast_spell(enemy)
+        elif choice == "5" and isinstance(player, Rogue):
+            player.sneak_attack(enemy)
+        elif choice == "6":
+            print("You fled from the battle!")
+            break
+        else:
+            print("Invalid choice!")
+
+        player.show_status()
+        enemy.show_status()
+
+    if player.hp <= 0:
+        print("You were defeated...")
+        return False
+    elif enemy.hp <= 0:
+        print(f"{player.name} defeated the {enemy.name}!")
+        player.gain_experience(50)
+        return True
+    
+    # Crafting System
+class CraftingRecipe:
+    def __init__(self, name, required_items, result_item):
+        self.name = name
+        self.required_items = required_items
+        self.result_item = result_item
+
+    def craft(self, player):
+        if all(item in player.inventory for item in self.required_items):
+            for item in self.required_items:
+                player.inventory.remove(item)
+            player.inventory.append(self.result_item)
+            print(f"{player.name} crafted {self.result_item} using {', '.join(self.required_items)}!")
+        else:
+            print(f"{player.name} does not have all the required items to craft {self.result_item}.")
+
+# Define crafting recipes
+health_potion_recipe = CraftingRecipe("Health Potion", ["Herb", "Water"], "Health Potion")
+mana_potion_recipe = CraftingRecipe("Mana Potion", ["Magic Herb", "Water"], "Mana Potion")
+sword_recipe = CraftingRecipe("Sword", ["Iron Ore", "Wood"], "Sword")
+
+def show_crafting_recipes():
+    print("\n-- Crafting Recipes --")
+    print("1. Health Potion: Requires Herb, Water")
+    print("2. Mana Potion: Requires Magic Herb, Water")
+    print("3. Sword: Requires Iron Ore, Wood")
+
+def craft_item(player):
+    show_crafting_recipes()
+    choice = input("Choose a recipe to craft (1/2/3): ")
