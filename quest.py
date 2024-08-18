@@ -137,3 +137,45 @@ def explore(player):
         quest.complete(player)
 
     return True
+
+# Extended Battle Function with Special Attacks
+def battle(player, enemy):
+    print(f"A wild {enemy.name} appears!")
+    while player.hp > 0 and enemy.hp > 0:
+        print("\n-- Battle Menu --")
+        print("1. Attack")
+        print("2. Heal")
+        print("3. Use Special Item")
+        print("4. Run")
+
+        choice = input("Choose an action: ")
+
+        if choice == "1":
+            player.attack(enemy)
+            if enemy.hp > 0:
+                enemy.attack(player)
+        elif choice == "2":
+            player.heal()
+            enemy.attack(player)
+        elif choice == "3":
+            if "Sword" in player.inventory:
+                sword.use(player)
+            if "Mana Potion" in player.inventory:
+                mana_potion.use(player)
+            enemy.attack(player)
+        elif choice == "4":
+            print("You fled from the battle!")
+            break
+        else:
+            print("Invalid choice!")
+
+        player.show_status()
+        enemy.show_status()
+
+    if player.hp <= 0:
+        print("You were defeated...")
+        return False
+    elif enemy.hp <= 0:
+        print(f"{player.name} defeated the {enemy.name}!")
+        player.gain_experience(50)
+        return True
