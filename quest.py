@@ -385,3 +385,80 @@ def show_crafting_recipes():
 def craft_item(player):
     show_crafting_recipes()
     choice = input("Choose a recipe to craft (1/2/3): ")
+
+if choice == "1":
+        health_potion_recipe.craft(player)
+    elif choice == "2":
+        mana_potion_recipe.craft(player)
+    elif choice == "3":
+        sword_recipe.craft(player)
+    else:
+        print("Invalid choice!")
+
+# Trading System
+class Merchant:
+    def __init__(self, name, inventory):
+        self.name = name
+        self.inventory = inventory
+
+    def show_inventory(self):
+        print(f"\n-- {self.name}'s Inventory --")
+        for item, price in self.inventory.items():
+            print(f"{item}: {price} gold")
+
+    def buy(self, player, item):
+        if item in self.inventory and player.gold >= self.inventory[item]:
+            player.inventory.append(item)
+            player.gold -= self.inventory[item]
+            print(f"{player.name} bought {item} for {self.inventory[item]} gold!")
+        else:
+            print("Transaction failed. Either you don't have enough gold or the item is unavailable.")
+
+    def sell(self, player, item):
+        if item in player.inventory:
+            sell_price = self.inventory.get(item, 10) // 2
+            player.inventory.remove(item)
+            player.gold += sell_price
+            print(f"{player.name} sold {item} for {sell_price} gold!")
+        else:
+            print(f"{player.name} does not have {item} to sell.")
+
+# Define a merchant
+blacksmith = Merchant("Blacksmith", {"Sword": 50, "Armor": 100, "Health Potion": 20, "Mana Potion": 30})
+
+def trade_with_merchant(player):
+    while True:
+        print("\n-- Trading Menu --")
+        print("1. Buy")
+        print("2. Sell")
+        print("3. Exit Trading")
+
+        choice = input("Choose an action: ")
+
+        if choice == "1":
+            blacksmith.show_inventory()
+            item = input("Enter the item you want to buy: ").strip()
+            blacksmith.buy(player, item)
+        elif choice == "2":
+            item = input("Enter the item you want to sell: ").strip()
+            blacksmith.sell(player, item)
+        elif choice == "3":
+            print("Exiting trading.")
+            break
+        else:
+            print("Invalid choice!")
+
+# Player Gold Management
+class Character:
+    def __init__(self, name, character_class):
+        self.name = name
+        self.character_class = character_class
+        self.level = 1
+        self.hp = 100
+        self.max_hp = 100
+        self.attack_power = 10
+        self.inventory = []
+        self.experience = 0
+        self.completed_quests = []
+        self.gold = 100  # Start with 100 gold
+
