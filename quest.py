@@ -266,3 +266,46 @@ class Armor(SpecialItem):
 # Define some special items
 armor = Armor("Steel Armor", 50)
 magic_staff = SpecialItem("Magic Staff", lambda player: print(f"{player.name} wields a Magic Staff!"))
+
+# Extended Inventory System
+def show_inventory(player):
+    print("\nInventory Details:")
+    for item in player.inventory:
+        if item == "Health Potion":
+            print(f"Item: Health Potion - Restores full HP.")
+        elif item == "Mana Potion":
+            print(f"Item: Mana Potion - Restores 50 Mana.")
+        elif item == "Sword":
+            print(f"Item: Sword - Increases attack power by 10.")
+        elif item == "Steel Armor":
+            print(f"Item: Steel Armor - Increases max HP by 50.")
+        elif item == "Magic Staff":
+            print(f"Item: Magic Staff - Boosts magical attack power.")
+        else:
+            print(f"Item: {item} - Unknown item.")
+    print("\n")
+
+def use_item(player):
+    if player.inventory:
+        print("Available items to use:")
+        show_inventory(player)
+        item = input("Enter the name of the item to use: ").strip()
+        for special_item in [sword, mana_potion, armor, magic_staff]:
+            if item == special_item.name:
+                special_item.use(player)
+                return
+        print(f"{player.name} does not have {item} or cannot use it!")
+
+def complete_quest(player):
+    quests = [
+        Quest("Find the lost ring", 100, "Ring of Power"),
+        Quest("Defeat the bandit leader", 150, "Bandit's Amulet"),
+        Quest("Rescue the villager", 200, "Villager's Gratitude"),
+        Quest("Retrieve the ancient scroll", 250, "Ancient Scroll"),
+        Quest("Slay the dragon", 300, "Dragon's Tooth")
+    ]
+    quest = random.choice(quests)
+    if quest.description not in player.completed_quests:
+        quest.complete(player)
+    else:
+        print("You have already completed this quest.")
