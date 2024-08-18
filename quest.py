@@ -179,3 +179,48 @@ def battle(player, enemy):
         print(f"{player.name} defeated the {enemy.name}!")
         player.gain_experience(50)
         return True
+
+def create_character():
+    name = input("Enter your character's name: ")
+    character_class = input("Choose your class (Warrior/Mage/Rogue): ")
+    return Character(name, character_class)
+
+def game_loop():
+    print("Welcome to the RPG Game!")
+    player = create_character()
+
+    while True:
+        print("\n-- Main Menu --")
+        print("1. Explore")
+        print("2. Show Status")
+        print("3. Quit Game")
+
+        choice = input("Choose an action: ")
+
+        if choice == "1":
+            if not explore(player):
+                print("Game Over!")
+                break
+        elif choice == "2":
+            player.show_status()
+        elif choice == "3":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice!")
+
+# Extended Character Classes for Different Roles
+class Warrior(Character):
+    def __init__(self, name):
+        super().__init__(name, "Warrior")
+        self.hp += 30
+        self.max_hp += 30
+        self.attack_power += 5
+
+class Mage(Character):
+    def __init__(self, name):
+        super().__init__(name, "Mage")
+        self.hp -= 20
+        self.max_hp -= 20
+        self.attack_power += 10
+        self.mana = 100
