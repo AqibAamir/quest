@@ -462,3 +462,107 @@ class Character:
         self.completed_quests = []
         self.gold = 100  # Start with 100 gold
 
+def show_status(self):
+        print(f"{self.name} (Level {self.level} {self.character_class}) - HP: {self.hp}/{self.max_hp} - Attack Power: {self.attack_power} - Gold: {self.gold}")
+        print("Inventory:", self.inventory)
+        print(f"Experience: {self.experience}")
+        print("Completed Quests:", self.completed_quests)
+
+   
+
+# Extended Quest System with Rewards
+class Quest:
+    def __init__(self, description, reward_exp, reward_item, reward_gold=0):
+        self.description = description
+        self.reward_exp = reward_exp
+        self.reward_item = reward_item
+        self.reward_gold = reward_gold
+        self.is_completed = False
+
+    def complete(self, player):
+        if not self.is_completed:
+            print(f"Quest Completed: {self.description}")
+            player.gain_experience(self.reward_exp)
+            if self.reward_item:
+                player.inventory.append(self.reward_item)
+                print(f"You have received: {self.reward_item}")
+            if self.reward_gold:
+                player.gold += self.reward_gold
+                print(f"You have received: {self.reward_gold} gold")
+            player.add_quest(self.description)
+            self.is_completed = True
+        else:
+            print("Quest already completed!")
+
+# Example Quest with Gold Reward
+quest_with_gold = Quest("Defeat the dragon", 300, "Dragon's Tooth", 200)
+
+# New Function to Find Quests
+def find_quest(player):
+    available_quests = [
+        Quest("Collect 5 Herbs", 50, "Health Potion", 10),
+        Quest("Defeat the Goblin Chief", 100, "Goblin's Helmet", 20),
+        quest_with_gold,
+    ]
+    quest = random.choice(available_quests)
+    quest.complete(player)
+
+# New NPC Interaction
+class NPC:
+    def __init__(self, name, dialogue):
+        self.name = name
+        self.dialogue = dialogue
+
+    def talk(self):
+        print(f"{self.name}: {self.dialogue}")
+
+# Example NPC
+wise_old_man = NPC("Wise Old Man", "Seek the ancient sword in the forest. It will guide your destiny.")
+
+def interact_with_npc():
+    print("\nYou meet a mysterious figure...")
+    wise_old_man.talk()
+    input("Press Enter to continue...")
+
+# Updated Game Loop to Include New Features
+def game_loop():
+    print("Welcome to the RPG Game!")
+    player = create_character()
+
+    while True:
+        print("\n-- Main Menu --")
+        print("1. Explore")
+        print("2. Show Status")
+        print("3. Craft Item")
+        print("4. Trade with Merchant")
+        print("5. Find Quest")
+        print("6. Interact with NPC")
+        print("7. Quit Game")
+
+        choice = input("Choose an action: ")
+
+        if choice == "1":
+            if not explore(player):
+                print("Game Over!")
+                break
+        elif choice == "2":
+            player.show_status()
+        elif choice == "3":
+            craft_item(player)
+        elif choice == "4":
+            trade_with_merchant(player)
+        elif choice == "5":
+            find_quest(player)
+        elif choice == "6":
+            interact_with_npc()
+        elif choice == "7":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice!")
+
+
+
+if __name__ == "__main__":
+    game_loop()
+
