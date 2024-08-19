@@ -12,6 +12,7 @@ class Character:
         self.inventory = []
         self.experience = 0
         self.completed_quests = []
+        self.gold = 100  # Start with 100 gold
 
     def attack(self, enemy):
         damage = random.randint(1, self.attack_power)
@@ -40,7 +41,7 @@ class Character:
             self.level_up()
 
     def show_status(self):
-        print(f"{self.name} (Level {self.level} {self.character_class}) - HP: {self.hp}/{self.max_hp} - Attack Power: {self.attack_power}")
+        print(f"{self.name} (Level {self.level} {self.character_class}) - HP: {self.hp}/{self.max_hp} - Attack Power: {self.attack_power} - Gold: {self.gold}")
         print("Inventory:", self.inventory)
         print(f"Experience: {self.experience}")
         print("Completed Quests:", self.completed_quests)
@@ -66,10 +67,11 @@ class Enemy:
 
 # Quest Class
 class Quest:
-    def __init__(self, description, reward_exp, reward_item):
+    def __init__(self, description, reward_exp, reward_item, reward_gold=0):
         self.description = description
         self.reward_exp = reward_exp
         self.reward_item = reward_item
+        self.reward_gold = reward_gold
         self.is_completed = False
 
     def complete(self, player):
@@ -79,6 +81,9 @@ class Quest:
             if self.reward_item:
                 player.inventory.append(self.reward_item)
                 print(f"You have received: {self.reward_item}")
+            if self.reward_gold:
+                player.gold += self.reward_gold
+                print(f"You have received: {self.reward_gold} gold")
             player.add_quest(self.description)
             self.is_completed = True
         else:
@@ -106,166 +111,6 @@ def use_mana_potion(player):
 
 sword = SpecialItem("Sword", use_sword)
 mana_potion = SpecialItem("Mana Potion", use_mana_potion)
-
-# Updated Explore Function with Special Items
-def explore(player):
-    print(f"\n{player.name} ventures into the unknown...")
-    event = random.choice(["enemy", "item", "nothing", "quest"])
-
-    if event == "enemy":
-        enemy = Enemy(random.choice(["Goblin", "Troll", "Orc", "Dragon"]), player.level)
-        battle_result = battle(player, enemy)
-        if not battle_result:
-            return False
-    elif event == "item":
-        item = random.choice(["Health Potion", "Mana Potion", "Sword"])
-        player.inventory.append(item)
-        print(f"{player.name} found a {item}!")
-        if item == "Sword":
-            sword.use(player)
-        elif item == "Mana Potion":
-            mana_potion.use(player)
-    elif event == "nothing":
-        print("Nothing interesting happened...")
-    elif event == "quest":
-        quests = [
-            Quest("Find the lost ring", 100, "Ring of Power"),
-            Quest("Defeat the bandit leader", 150, "Bandit's Amulet"),
-            Quest("Rescue the villager", 200, "Villager's Gratitude")
-        ]
-        quest = random.choice(quests)
-        quest.complete(player)
-
-    return True
-
-# Extended Battle Function with Special Attacks
-def battle(player, enemy):
-    print(f"A wild {enemy.name} appears!")
-    while player.hp > 0 and enemy.hp > 0:
-        print("\n-- Battle Menu --")
-        print("1. Attack")
-        print("2. Heal")
-        print("3. Use Special Item")
-        print("4. Run")
-
-        choice = input("Choose an action: ")
-
-        if choice == "1":
-            player.attack(enemy)
-            if enemy.hp > 0:
-                enemy.attack(player)
-        elif choice == "2":
-            player.heal()
-            enemy.attack(player)
-        elif choice == "3":
-            if "Sword" in player.inventory:
-                sword.use(player)
-            if "Mana Potion" in player.inventory:
-                mana_potion.use(player)
-            enemy.attack(player)
-        elif choice == "4":
-            print("You fled from the battle!")
-            break
-        else:
-            print("Invalid choice!")
-
-        player.show_status()
-        enemy.show_status()
-
-    if player.hp <= 0:
-        print("You were defeated...")
-        return False
-    elif enemy.hp <= 0:
-        print(f"{player.name} defeated the {enemy.name}!")
-        player.gain_experience(50)
-        return True
-
-def create_character():
-    name = input("Enter your character's name: ")
-    character_class = input("Choose your class (Warrior/Mage/Rogue): ")
-    return Character(name, character_class)
-
-def game_loop():
-    print("Welcome to the RPG Game!")
-    player = create_character()
-
-    while True:
-        print("\n-- Main Menu --")
-        print("1. Explore")
-        print("2. Show Status")
-        print("3. Quit Game")
-
-        choice = input("Choose an action: ")
-
-        if choice == "1":
-            if not explore(player):
-                print("Game Over!")
-                break
-        elif choice == "2":
-            player.show_status()
-        elif choice == "3":
-            print("Goodbye!")
-            break
-        else:
-            print("Invalid choice!")
-
-# Extended Character Classes for Different Roles
-class Warrior(Character):
-    def __init__(self, name):
-        super().__init__(name, "Warrior")
-        self.hp += 30
-        self.max_hp += 30
-        self.attack_power += 5
-
-class Mage(Character):
-    def __init__(self, name):
-        super().__init__(name, "Mage")
-        self.hp -= 20
-        self.max_hp -= 20
-        self.attack_power += 10
-        self.mana = 100
-
-def cast_spell(self, enemy):
-        if self.mana >= 20:
-            spell_damage = random.randint(15, 30)
-            enemy.hp -= spell_damage
-            self.mana -= 20
-            print(f"{self.name} casts a spell on {enemy.name} for {spell_damage} damage!")
-        else:
-            print(f"{self.name} does not have enough mana to cast a spell!")
-
-class Rogue(Character):
-    def __init__(self, name):
-        super().__init__(name, "Rogue")
-        self.attack_power += 10
-        self.stealth = True
-
-    def sneak_attack(self, enemy):
-        if self.stealth:
-            sneak_damage = random.randint(20, 40)
-            enemy.hp -= sneak_damage
-            print(f"{self.name} performs a sneak attack on {enemy.name} for {sneak_damage} damage!")
-        else:
-            print(f"{self.name} is not in stealth mode!")
-
-# Additional Special Items
-class Armor(SpecialItem):
-    def __init__(self, name, defense_boost):
-        super().__init__(name, None)
-        self.defense_boost = defense_boost
-
-    def use(self, player):
-        if self.name in player.inventory:
-            player.max_hp += self.defense_boost
-            player.hp = min(player.hp + self.defense_boost, player.max_hp)
-            print(f"{player.name} equipped {self.name}, increasing max HP by {self.defense_boost}!")
-            player.inventory.remove(self.name)
-        else:
-            print(f"{player.name} does not have {self.name}!")
-
-# Define some special items
-armor = Armor("Steel Armor", 50)
-magic_staff = SpecialItem("Magic Staff", lambda player: print(f"{player.name} wields a Magic Staff!"))
 
 # Extended Inventory System
 def show_inventory(player):
@@ -296,66 +141,25 @@ def use_item(player):
                 return
         print(f"{player.name} does not have {item} or cannot use it!")
 
-def complete_quest(player):
-    quests = [
-        Quest("Find the lost ring", 100, "Ring of Power"),
-        Quest("Defeat the bandit leader", 150, "Bandit's Amulet"),
-        Quest("Rescue the villager", 200, "Villager's Gratitude"),
-        Quest("Retrieve the ancient scroll", 250, "Ancient Scroll"),
-        Quest("Slay the dragon", 300, "Dragon's Tooth")
-    ]
-    quest = random.choice(quests)
-    if quest.description not in player.completed_quests:
-        quest.complete(player)
-    else:
-        print("You have already completed this quest.")
+# Additional Special Items
+class Armor(SpecialItem):
+    def __init__(self, name, defense_boost):
+        super().__init__(name, None)
+        self.defense_boost = defense_boost
 
-    # Additional Combat Options
-def enhanced_battle(player, enemy):
-    print(f"A wild {enemy.name} appears!")
-    while player.hp > 0 and enemy.hp > 0:
-        print("\n-- Battle Menu --")
-        print("1. Attack")
-        print("2. Heal")
-        print("3. Use Special Item")
-        print("4. Use Magic (Mage Only)")
-        print("5. Sneak Attack (Rogue Only)")
-        print("6. Run")
-
-        choice = input("Choose an action: ")
-
-        if choice == "1":
-            player.attack(enemy)
-            if enemy.hp > 0:
-                enemy.attack(player)
-        elif choice == "2":
-            player.heal()
-            enemy.attack(player)
-        elif choice == "3":
-            use_item(player)
-            enemy.attack(player)
-        elif choice == "4" and isinstance(player, Mage):
-            player.cast_spell(enemy)
-        elif choice == "5" and isinstance(player, Rogue):
-            player.sneak_attack(enemy)
-        elif choice == "6":
-            print("You fled from the battle!")
-            break
+    def use(self, player):
+        if self.name in player.inventory:
+            player.max_hp += self.defense_boost
+            player.hp = min(player.hp + self.defense_boost, player.max_hp)
+            print(f"{player.name} equipped {self.name}, increasing max HP by {self.defense_boost}!")
+            player.inventory.remove(self.name)
         else:
-            print("Invalid choice!")
+            print(f"{player.name} does not have {self.name}!")
 
-        player.show_status()
-        enemy.show_status()
+armor = Armor("Steel Armor", 50)
+magic_staff = SpecialItem("Magic Staff", lambda player: print(f"{player.name} wields a Magic Staff!"))
 
-    if player.hp <= 0:
-        print("You were defeated...")
-        return False
-    elif enemy.hp <= 0:
-        print(f"{player.name} defeated the {enemy.name}!")
-        player.gain_experience(50)
-        return True
-    
-    # Crafting System
+# Crafting System
 class CraftingRecipe:
     def __init__(self, name, required_items, result_item):
         self.name = name
@@ -371,7 +175,6 @@ class CraftingRecipe:
         else:
             print(f"{player.name} does not have all the required items to craft {self.result_item}.")
 
-# Define crafting recipes
 health_potion_recipe = CraftingRecipe("Health Potion", ["Herb", "Water"], "Health Potion")
 mana_potion_recipe = CraftingRecipe("Mana Potion", ["Magic Herb", "Water"], "Mana Potion")
 sword_recipe = CraftingRecipe("Sword", ["Iron Ore", "Wood"], "Sword")
@@ -386,7 +189,7 @@ def craft_item(player):
     show_crafting_recipes()
     choice = input("Choose a recipe to craft (1/2/3): ")
 
-if choice == "1":
+    if choice == "1":
         health_potion_recipe.craft(player)
     elif choice == "2":
         mana_potion_recipe.craft(player)
@@ -423,7 +226,6 @@ class Merchant:
         else:
             print(f"{player.name} does not have {item} to sell.")
 
-# Define a merchant
 blacksmith = Merchant("Blacksmith", {"Sword": 50, "Armor": 100, "Health Potion": 20, "Mana Potion": 30})
 
 def trade_with_merchant(player):
@@ -443,126 +245,36 @@ def trade_with_merchant(player):
             item = input("Enter the item you want to sell: ").strip()
             blacksmith.sell(player, item)
         elif choice == "3":
-            print("Exiting trading.")
             break
         else:
             print("Invalid choice!")
 
-# Player Gold Management
-class Character:
-    def __init__(self, name, character_class):
-        self.name = name
-        self.character_class = character_class
-        self.level = 1
-        self.hp = 100
-        self.max_hp = 100
-        self.attack_power = 10
-        self.inventory = []
-        self.experience = 0
-        self.completed_quests = []
-        self.gold = 100  # Start with 100 gold
+# Example Usage:
+# Create a character
+hero = Character("Aragon", "Warrior")
 
-def show_status(self):
-        print(f"{self.name} (Level {self.level} {self.character_class}) - HP: {self.hp}/{self.max_hp} - Attack Power: {self.attack_power} - Gold: {self.gold}")
-        print("Inventory:", self.inventory)
-        print(f"Experience: {self.experience}")
-        print("Completed Quests:", self.completed_quests)
+# Show character status
+hero.show_status()
 
-   
+# Example quest
+quest1 = Quest("Defeat the Goblin King", 100, "Sword", 50)
+quest1.complete(hero)
 
-# Extended Quest System with Rewards
-class Quest:
-    def __init__(self, description, reward_exp, reward_item, reward_gold=0):
-        self.description = description
-        self.reward_exp = reward_exp
-        self.reward_item = reward_item
-        self.reward_gold = reward_gold
-        self.is_completed = False
+# Battle with an enemy
+enemy1 = Enemy("Goblin", 2)
+hero.attack(enemy1)
+enemy1.show_status()
 
-    def complete(self, player):
-        if not self.is_completed:
-            print(f"Quest Completed: {self.description}")
-            player.gain_experience(self.reward_exp)
-            if self.reward_item:
-                player.inventory.append(self.reward_item)
-                print(f"You have received: {self.reward_item}")
-            if self.reward_gold:
-                player.gold += self.reward_gold
-                print(f"You have received: {self.reward_gold} gold")
-            player.add_quest(self.description)
-            self.is_completed = True
-        else:
-            print("Quest already completed!")
+# Use special items
+use_item(hero)
 
-# Example Quest with Gold Reward
-quest_with_gold = Quest("Defeat the dragon", 300, "Dragon's Tooth", 200)
+# Crafting
+craft_item(hero)
 
-# New Function to Find Quests
-def find_quest(player):
-    available_quests = [
-        Quest("Collect 5 Herbs", 50, "Health Potion", 10),
-        Quest("Defeat the Goblin Chief", 100, "Goblin's Helmet", 20),
-        quest_with_gold,
-    ]
-    quest = random.choice(available_quests)
-    quest.complete(player)
+# Trading with a merchant
+trade_with_merchant(hero)
 
-# New NPC Interaction
-class NPC:
-    def __init__(self, name, dialogue):
-        self.name = name
-        self.dialogue = dialogue
+# Show final status
+hero.show_status()
 
-    def talk(self):
-        print(f"{self.name}: {self.dialogue}")
-
-# Example NPC
-wise_old_man = NPC("Wise Old Man", "Seek the ancient sword in the forest. It will guide your destiny.")
-
-def interact_with_npc():
-    print("\nYou meet a mysterious figure...")
-    wise_old_man.talk()
-    input("Press Enter to continue...")
-
-# Updated Game Loop to Include New Features
-def game_loop():
-    print("Welcome to the RPG Game!")
-    player = create_character()
-
-    while True:
-        print("\n-- Main Menu --")
-        print("1. Explore")
-        print("2. Show Status")
-        print("3. Craft Item")
-        print("4. Trade with Merchant")
-        print("5. Find Quest")
-        print("6. Interact with NPC")
-        print("7. Quit Game")
-
-        choice = input("Choose an action: ")
-
-        if choice == "1":
-            if not explore(player):
-                print("Game Over!")
-                break
-        elif choice == "2":
-            player.show_status()
-        elif choice == "3":
-            craft_item(player)
-        elif choice == "4":
-            trade_with_merchant(player)
-        elif choice == "5":
-            find_quest(player)
-        elif choice == "6":
-            interact_with_npc()
-        elif choice == "7":
-            print("Goodbye!")
-            break
-        else:
-            print("Invalid choice!")
-
-
-
-if __name__ == "__main__":
-    game_loop()
 
